@@ -1,0 +1,111 @@
+## http-test.http
+
+## Register User
+## Try Logging in with newly minted user to http://localhost:8080/user
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "username":"Sean",
+    "password":"password"
+}
+
+You should get thye response:
+{
+    "userId": 2,
+    "username": "Sean",
+    "password": "$2a$10$aArgY3BuBhu8h8QfCCtrKeg1K3Lck8pRgzRpJa9w0iyMGRon4aA7O",
+    "authorities": [
+        {
+            "roleId": 2,
+            "authority": "USER"
+        }
+    ],
+    "enabled": true,
+    "accountNonLocked": true,
+    "accountNonExpired": true,
+    "credentialsNonExpired": true
+}
+
+## Logging in registered user just registerd
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "username":"Sean",
+    "password":"password"
+}
+
+You should get response:
+{
+    "user": {
+        "userId": 2,
+        "username": "Sean",
+        "password": "$2a$10$aArgY3BuBhu8h8QfCCtrKeg1K3Lck8pRgzRpJa9w0iyMGRon4aA7O",
+        "authorities": [
+            {
+                "roleId": 2,
+                "authority": "USER"
+            }
+        ],
+        "enabled": true,
+        "accountNonLocked": true,
+        "accountNonExpired": true,
+        "credentialsNonExpired": true
+    },
+    "jwt": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiU2VhbiIsImlhdCI6MTcwNDg2MDk5Mywicm9sZXMiOiJVU0VSIn0.Ps7VaDelyrCNPJtyift_AB3c7Cn1Yafkm9WM1wKNDCBpeNpetO08DmhIlW-IXedJqoI8LHWYIr6n5huusfV1raLP70W_h61jeOQOAFGFsGOGXl9w455smziBjPXHfdrN0rq65NulBYApRjcIpS_iWYxVdE5MUL30ffGwvfKUQj1WrTxf33EpllZ2Pf6bnhzvxjEAtzNreANKkO8V9_5nsGmhjxxXwwppfCxqPELFew5Rs5eiiskeC4HzUqg1wMWWqZVT78ILZ_HylNqi4WT3b7rriij4XULJOlHPuAJYlL7V5KcQxQVK5oSNcWXrEqv5SA3yw-T1QbLm0QKNEuxL6A"
+}
+
+
+##  Access Resources with newly created user (With jwt token received at login)
+## You should get 401 for GET http://localhost:8080/admin/
+GET http://localhost:8080/user/ 
+
+Authorization-Type: Bearer Token
+token:eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiU2VhbiIsImlhdCI6MTcwNDg2MDk5Mywicm9sZXMiOiJVU0VSIn0.Ps7VaDelyrCNPJtyift_AB3c7Cn1Yafkm9WM1wKNDCBpeNpetO08DmhIlW-IXedJqoI8LHWYIr6n5huusfV1raLP70W_h61jeOQOAFGFsGOGXl9w455smziBjPXHfdrN0rq65NulBYApRjcIpS_iWYxVdE5MUL30ffGwvfKUQj1WrTxf33EpllZ2Pf6bnhzvxjEAtzNreANKkO8V9_5nsGmhjxxXwwppfCxqPELFew5Rs5eiiskeC4HzUqg1wMWWqZVT78ILZ_HylNqi4WT3b7rriij4XULJOlHPuAJYlL7V5KcQxQVK5oSNcWXrEqv5SA3yw-T1QbLm0QKNEuxL6A
+
+
+You should get response:
+Status: 200OK
+<h1>User Access Level</h1>
+
+
+## Logging in admin user created at application startup
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "username":"admin",
+    "password":"password"
+}
+
+You should get response:
+{
+    "user": {
+        "userId": 1,
+        "username": "admin",
+        "password": "$2a$10$NHKwFPWWC6VemH5kLw9CYe7vXl0SqZhaXzkJR/LQPw3bU/GQEQYdi",
+        "authorities": [
+            {
+                "roleId": 1,
+                "authority": "ADMIN"
+            }
+        ],
+        "enabled": true,
+        "accountNonLocked": true,
+        "accountNonExpired": true,
+        "credentialsNonExpired": true
+    },
+    "jwt": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiYWRtaW4iLCJpYXQiOjE3MDQ4NjgxMTIsInJvbGVzIjoiQURNSU4ifQ.VgwrhKR-Rx8AlzlVEoOKz3kwsqk2Z6SPrGaTgoLWLOHld2tljjzodEePYIZ_NJkioRVueXMiK8-BQB8vCXhPZocmN8QezjcKpmn_4Qf3eScbHUwa2CHELwztGg7Ek4hwtsyMNZamzD4Gg8pegCwQBBYha9Y_oe5sWKs71b8EtAA30zlSJrRCcp_ISxlAtF5jpkDNqgZ0SIc0I-6l7xOVTs775RrFi_sn6VmqVA21ULCNM2ctvWO5Vh7JPAO4trw7bimBIoIg_smhA0ymSQIs5GLODzAafwsn0pamZFHGxbyAawXkP3pPbkeFajcshsdbS455QeBsIdGwy0BA8u-WFg"
+}
+
+
+##  Access Admin ONLY Resources admin user (With jwt token received at login)
+GET http://localhost:8080/admin/ 
+
+Authorization-Type: Bearer Token
+token: eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiYWRtaW4iLCJpYXQiOjE3MDQ4NjgxMTIsInJvbGVzIjoiQURNSU4ifQ.VgwrhKR-Rx8AlzlVEoOKz3kwsqk2Z6SPrGaTgoLWLOHld2tljjzodEePYIZ_NJkioRVueXMiK8-BQB8vCXhPZocmN8QezjcKpmn_4Qf3eScbHUwa2CHELwztGg7Ek4hwtsyMNZamzD4Gg8pegCwQBBYha9Y_oe5sWKs71b8EtAA30zlSJrRCcp_ISxlAtF5jpkDNqgZ0SIc0I-6l7xOVTs775RrFi_sn6VmqVA21ULCNM2ctvWO5Vh7JPAO4trw7bimBIoIg_smhA0ymSQIs5GLODzAafwsn0pamZFHGxbyAawXkP3pPbkeFajcshsdbS455QeBsIdGwy0BA8u-WFg
+
+You should get response:
+Status: 200OK
+<h1>Admin Level Access</h1>
